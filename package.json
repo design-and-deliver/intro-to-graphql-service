@@ -1,17 +1,16 @@
 {
-  "name": "intro-to-graphql-service",
+  "name": "graphql-server-demo",
   "version": "1.0.0",
-  "description": "",
+  "description": "A simple GraphQL server demo",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "apollo-server-express": "^3.13.0",
-    "express": "^4.19.2",
-    "graphql": "^16.8.1"
-  }
+    "express": "^4.17.1",
+    "graphql": "^15.5.1"
+  },
+  "author": "",
+  "license": "ISC"
 }

@@ -1,49 +1,48 @@
 const express = require('express');
 const { ApolloServer, gql } = require('apollo-server-express');
 
+const app = express();
+const port = 4000;
+
+// Define the schema
+const typeDefs = gql`
+  type User {
+    id: ID!
+    name: String
+    email: String
+  }
+
+  type Query {
+    user(id: ID!): User
+  }
+`;
+
+// Define the resolvers
+const resolvers = {
+  Query: {
+    user: (parent, args, context, info) => {
+      const users = [
+        { id: 1, name: 'John Doe', email: 'john.doe@example.com' },
+        { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com' }
+      ];
+      return users.find(user => user.id === args.id);
+    }
+  }
+};
+
 async function startServer() {
-  // Define your schema
-  const typeDefs = gql`
-    type Book {
-      title: String
-      author: String
-    }
-
-    type Query {
-      books: [Book]
-    }
-  `;
-
-  // Define your resolvers
-  const resolvers = {
-    Query: {
-      books: () => [
-        { title: 'The Awakening', author: 'Kate Chopin' },
-        { title: 'City of Glass', author: 'Paul Auster' }
-      ]
-    }
-  };
-
-  // Create an instance of ApolloServer
-  const server = new ApolloServer({ typeDefs, resolvers });
-
-  // Initialize an Express application
-  const app = express();
-
-  // Start the Apollo server
+  const server = new ApolloServer({ 
+    typeDefs, 
+    resolvers, 
+    playground: true, // Enables Apollo Studio Explorer
+    introspection: true // Allows introspection for the schema
+  });
   await server.start();
-
-  // Apply the Apollo GraphQL middleware to the Express server
   server.applyMiddleware({ app });
 
-  // Define the port
-  const PORT = process.env.PORT || 4000;
-
-  // Start the Express server
-  app.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}${server.graphqlPath}`);
+  app.listen(port, () => {
+    console.log(`Server is running at http://localhost:${port}${server.graphqlPath}`);
   });
 }
 
-// Start the server
 startServer();
