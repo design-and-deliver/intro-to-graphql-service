@@ -1,40 +1,52 @@
 const { ApolloServer, gql } = require('apollo-server-express');
+const fs = require('fs');
+const path = require('path');
 
-// Sample type definitions and resolvers
+// Helper function to read data from the JSON file
+function readData() {
+  const dataFilePath = path.join(__dirname, 'db.json');
+  const data = fs.readFileSync(dataFilePath);
+  return JSON.parse(data);
+}
+
+// Define the schema
 const typeDefs = gql`
-    type Item {
-        id: ID!
-        name: String!
-    }
+  type User {
+    id: ID!
+    name: String!
+    email: String!
+    posts: [Post!]!
+  }
 
-    type Query {
-        items: [Item]
-    }
+  type Post {
+    id: ID!
+    text: String!
+    likes: Int!
+  }
 
-    type Mutation {
-        addItem(id: ID!, name: String!): Item
-    }
+  type Query {
+    user(id: ID!): User
+    users: [User]
+  }
 `;
 
-let items = [];
-
+// Define the resolvers
 const resolvers = {
-    Query: {
-        items: () => items,
+  Query: {
+    user: (parent, args) => {
+      const users = readData();
+      return users.find(user => user.id == args.id);
     },
-    Mutation: {
-        addItem: (_, { id, name }) => {
-            const newItem = { id, name };
-            items.push(newItem);
-            return newItem;
-        }
+    users: () => {
+      return readData();
     }
+  }
 };
 
 async function startApolloServer() {
-    const server = new ApolloServer({ typeDefs, resolvers });
-    await server.start();
-    return server;
+  const server = new ApolloServer({ typeDefs, resolvers });
+  await server.start();
+  return server;
 }
 
 module.exports = startApolloServer;
